@@ -2030,6 +2030,128 @@
         .paragraforeduzido {
             font-size: 14px;
         }
+        /* Base compartilhada (mantém como está) */
+.video-thumbnail {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    height: 400px;
+    margin: 20px auto;
+    border-radius: 16px;
+    padding: 20px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Fundo da thumbnail */
+.video-bg {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    background-image: url('https://res.cloudinary.com/di4ria1pf/image/upload/v1745434099/k1hkgcwcv7ydys0dxmzu.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* Ícone play padrão */
+.play-icon {
+    z-index: 1;
+    font-size: 90px;
+    border-radius: 25%;
+    width: 150px;
+    height: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    color: #fff;
+}
+
+/* Verde */
+.video-thumbnail.verde {
+    border: 2px solid #b9e5a9;
+}
+.verde-bg::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(185, 229, 169, 0.4);
+    z-index: 1;
+}
+.verde-icon {
+    background-color: #b9e5a9;
+}
+
+/* Azul */
+.video-thumbnail.azul {
+    border: 2px solid #a9d1e5;
+}
+.azul-bg::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(169, 209, 229, 0.4);
+    z-index: 1;
+}
+.azul-icon {
+    background-color: #a9d1e5;
+}
+
+.play-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Modal de vídeo */
+.video-modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    align-items: center;
+    justify-content: center;
+}
+
+.video-modal .modal-content {
+    position: relative;
+    background-color: #000;
+    padding: 10px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+}
+
+.video-modal iframe {
+    width: 100%;
+    height: 450px;
+    border: none;
+    border-radius: 10px;
+}
+
+.fechar-modal {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 30px;
+    color: white;
+    background: #b9e5a9;
+    border-radius: 50%;
+    padding: 5px 10px;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -2435,8 +2557,22 @@
             comunicação clara e respeitosa e ficar atento aos prazos e às normas são atitudes fundamentais para ter
             uma boa experiência acadêmica. Esses cuidados facilitam a adaptação, contribuem para uma convivência
             harmoniosa com colegas, professores e funcionários e tornam a jornada na universidade mais organizada,
-            produtivae tranquila.
+            produtiva e tranquila.
         </p>
+        <!-- Bloco 2 - Azul -->
+        <div class="video-thumbnail azul"
+            data-video="https://player-vz-04af0c61-9a0.tv.pandavideo.com.br/embed/?v=833ad96e-7db6-4e0f-8c86-1721fe15121e&preload=false">
+            <div class="video-bg azul-bg"></div>
+            <div class="play-icon azul-icon">&#9658;</div>
+        </div>
+        
+        <!-- Modal de Vídeo (compartilhado) -->
+        <div id="videoModal" class="video-modal">
+            <div class="modal-content">
+                <span class="fechar-modal">&times;</span>
+                <iframe id="videoIframe" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
         </div>
     </section>
     <section class="secao1" id="secao3">
@@ -2638,6 +2774,19 @@
             envolver em projetos, estabelecer conexões e aprender com cada experiência acadêmica são atitudes
             que fortalecem tanto o aprendizado quanto o desenvolvimento para além da sala de aula.
         </p>
+            <!-- Bloco 1 - Verde -->
+            <div class="video-thumbnail verde"
+                data-video="https://player-vz-04af0c61-9a0.tv.pandavideo.com.br/embed/?v=e2f5ed82-78da-4fdb-be76-576e33856a76&preload=false">
+                <div class="video-bg verde-bg"></div>
+                <div class="play-icon verde-icon">&#9658;</div>
+            </div>
+            <!-- Modal de Vídeo (compartilhado) -->
+            <div id="videoModal" class="video-modal">
+                <div class="modal-content">
+                    <span class="fechar-modal">&times;</span>
+                    <iframe id="videoIframe" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
         </div>
     </section>
     <section class="secao4" id="secao4">
@@ -3221,7 +3370,45 @@
 
                                     iframe.src = ''; // limpa o conteúdo do iframe
                                     iframeContainer.style.display = 'none';
-                                }                
+                                }         
+                                
+                                const thumbnails = document.querySelectorAll('.video-thumbnail');
+                                    const modal = document.getElementById('videoModal');
+                                    const iframe = document.getElementById('videoIframe');
+                                    const fechar = document.querySelector('.fechar-modal');
+
+                                    thumbnails.forEach(thumbnail => {
+                                        thumbnail.addEventListener('click', () => {
+                                            const videoLink = thumbnail.getAttribute('data-video');
+                                            iframe.src = videoLink + "?autoplay=1";
+                                            modal.style.display = 'flex';
+                                        });
+                                    });
+
+                                    fechar.addEventListener('click', () => {
+                                        modal.style.display = 'none';
+                                        iframe.src = '';
+                                    });
+
+                                    window.addEventListener('click', (e) => {
+                                        if (e.target === modal) {
+                                            modal.style.display = 'none';
+                                            iframe.src = '';
+                                        }
+                                    });
+                                    // Abrir modal ao clicar na imagem
+                                    function openModal(imgElement) {
+                                        let modal = document.getElementById("imageModal");
+                                        let modalImg = document.getElementById("modalImg");
+
+                                        modal.style.display = "flex";
+                                        modalImg.src = imgElement.src;
+                                    }
+
+                                    // Fechar modal ao clicar no fundo ou no botão "X"
+                                    function closeModal() {
+                                        document.getElementById("imageModal").style.display = "none";
+                                    }
     </script>
 </body>
 </html>
