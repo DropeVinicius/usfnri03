@@ -2152,6 +2152,88 @@
     padding: 5px 10px;
     cursor: pointer;
 }
+.modal-imagem {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modal-imagem.ativo {
+    display: flex;
+}
+
+.imagem-modal {
+    max-width: 90%;
+    max-height: 80%;
+    margin-bottom: 20px;
+}
+
+.fechar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+}
+
+.seta-modal {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.seta-modal.esquerda {
+    left: 20px;
+}
+
+.seta-modal.direita {
+    right: 20px;
+}
+
+/* Indicador numérico */
+.indicador-contador {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 6px 12px;
+    border-radius: 15px;
+}
+
+/* Pontinhos */
+.indicador-pontos {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.indicador-pontos span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.3);
+    cursor: pointer;
+}
+
+.indicador-pontos span.ativo {
+    background-color: white;
+}
     </style>
 </head>
 <body>
@@ -2285,6 +2367,21 @@
                 <span class="text-italic"><strong>Fonte:</strong> Elaborado pelo autor.</span>
             </p>
         </section>
+        <!-- Modal de Imagem Ampliada -->
+        <div id="modal-imagem" class="modal-imagem">
+            <span class="fechar" onclick="fecharModal()">&times;</span>
+            <img class="imagem-modal" id="imagem-ampliada" alt="Imagem ampliada">
+        
+            <!-- Setas -->
+            <button class="seta-modal esquerda" onclick="navegarModal(-1)">&#10094;</button>
+            <button class="seta-modal direita" onclick="navegarModal(1)">&#10095;</button>
+        
+            <!-- Indicador numérico -->
+            <div class="indicador-contador" id="contador-modal">1 / 1</div>
+        
+            <!-- Pontinhos -->
+            <div class="indicador-pontos" id="pontos-modal"></div>
+        </div>
         <p>
             No diálogo anterior, vimos como o professor incentivou a participação dos alunos com perguntas abertas,
             como “Como isso acontece?”. Esse tipo de pergunta estimula respostas mais completas e reflexivas, ao
@@ -3409,6 +3506,70 @@
                                     function closeModal() {
                                         document.getElementById("imageModal").style.display = "none";
                                     }
+                                    let imagensModal = [];
+                                    let indiceModal = 0;
+
+                                        function prepararModal() {
+                                            document.querySelectorAll('.slider-quadrinhos').forEach((sliderContainer) => {
+                                                const imagens = sliderContainer.querySelectorAll('.slide');
+                                                imagens.forEach((img, index) => {
+                                                    img.style.cursor = 'pointer';
+                                                    img.addEventListener('click', () => {
+                                                        imagensModal = Array.from(imagens).map(i => i.src);
+                                                        indiceModal = index;
+                                                        abrirModal(imagensModal[indiceModal]);
+                                                    });
+                                                });
+                                            });
+                                        }
+
+                                        function abrirModal(src) {
+                                            document.getElementById('imagem-ampliada').src = src;
+                                            document.getElementById('modal-imagem').classList.add('ativo');
+                                            atualizarContador();
+                                            atualizarPontos();
+                                        }
+
+                                        function fecharModal() {
+                                            document.getElementById('modal-imagem').classList.remove('ativo');
+                                        }
+
+                                        function navegarModal(direcao) {
+                                            indiceModal = (indiceModal + direcao + imagensModal.length) % imagensModal.length;
+                                            document.getElementById('imagem-ampliada').src = imagensModal[indiceModal];
+                                            atualizarContador();
+                                            atualizarPontos();
+                                        }
+
+                                        function atualizarContador() {
+                                            document.getElementById('contador-modal').textContent = `${indiceModal + 1} / ${imagensModal.length}`;
+                                        }
+
+                                        function atualizarPontos() {
+                                            const container = document.getElementById('pontos-modal');
+                                            container.innerHTML = '';
+                                            imagensModal.forEach((_, i) => {
+                                                const ponto = document.createElement('span');
+                                                if (i === indiceModal) ponto.classList.add('ativo');
+                                                ponto.addEventListener('click', () => {
+                                                    indiceModal = i;
+                                                    document.getElementById('imagem-ampliada').src = imagensModal[i];
+                                                    atualizarContador();
+                                                    atualizarPontos();
+                                                });
+                                                container.appendChild(ponto);
+                                            });
+                                        }
+
+                                        document.addEventListener('DOMContentLoaded', prepararModal);
+                                        document.addEventListener('keydown', function (e) {
+                                                const modalAtivo = document.getElementById('modal-imagem').classList.contains('ativo');
+                                                if (!modalAtivo) return;
+
+                                                if (e.key === 'ArrowLeft') navegarModal(-1);
+                                                if (e.key === 'ArrowRight') navegarModal(1);
+                                                if (e.key === 'Escape') fecharModal();
+                                            });
     </script>
 </body>
 </html>
